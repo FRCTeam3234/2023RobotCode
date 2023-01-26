@@ -125,6 +125,51 @@ public class Robot extends TimedRobot {
   @Override
   public void teleopPeriodic() {
     controlInputs.readControls();
+    sensorInputs.readSensors();
+
+    if(controlInputs.pixyDrive)
+    {
+      SmartDashboard.putBoolean("pixy drive", true);
+      if (sensorInputs.objectDetected)
+      {
+        int objectHorizontalCenterCoordinate =
+         sensorInputs.objectXCoordinate +
+         (sensorInputs.objectWidth / 2);
+        SmartDashboard.putNumber("x calc middle", objectHorizontalCenterCoordinate);
+        if (objectHorizontalCenterCoordinate < 145)
+        {
+          SmartDashboard.putBoolean("turn left", true);
+          SmartDashboard.putBoolean("turn right", false);
+          driveTrain.arcadeDrive(0, -.20);
+        }
+        else
+        {
+          if (objectHorizontalCenterCoordinate > 169)
+          {
+            SmartDashboard.putBoolean("turn left", false);
+            SmartDashboard.putBoolean("turn right", true);
+            driveTrain.arcadeDrive(0, .20);
+          }
+          else
+          {
+            SmartDashboard.putBoolean("turn left", false);
+            SmartDashboard.putBoolean("turn right", false);
+            driveTrain.arcadeDrive(0, 0);
+          }
+        }
+      }
+      else
+      {
+        driveTrain.arcadeDrive(0,0);
+      }
+    }
+    else
+    {
+      SmartDashboard.putBoolean("pixy drive", false);
+      driveTrain.arcadeDrive(
+      -controlInputs.driveStickY*forwardPower,
+      controlInputs.driveStickX*turnPower);  
+    }
 
     /*if (controlInputs.speedButton) {
       if (speed < 1.0) {speed += 0.1;}
@@ -137,9 +182,9 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Speed", speed);
     SmartDashboard.putNumber("Vel", driveTrain.motorVel());*/
 
-    driveTrain.arcadeDrive(
+    /*driveTrain.arcadeDrive(
       -controlInputs.driveStickY*forwardPower,
-      controlInputs.driveStickX*turnPower);
+      controlInputs.driveStickX*turnPower);*/
   }
 
   /** This function is called once when the robot is disabled. */
