@@ -29,6 +29,7 @@ public class Robot extends TimedRobot {
   private final ControlInputs controlInputs = new ControlInputs();
   private final SensorInputs sensorInputs = new SensorInputs();
   private Components components = new Components();
+  private PixyTracker pixyTracker = new PixyTracker();
 
   //Variable Initiation
   private double forwardPower = 1.0;
@@ -129,43 +130,11 @@ public class Robot extends TimedRobot {
 
     if(controlInputs.pixyDrive)
     {
-      SmartDashboard.putBoolean("pixy drive", true);
-      if (sensorInputs.objectDetected)
-      {
-        int objectHorizontalCenterCoordinate =
-         sensorInputs.objectXCoordinate +
-         (sensorInputs.objectWidth / 2);
-        SmartDashboard.putNumber("x calc middle", objectHorizontalCenterCoordinate);
-        if (objectHorizontalCenterCoordinate < 145)
-        {
-          SmartDashboard.putBoolean("turn left", true);
-          SmartDashboard.putBoolean("turn right", false);
-          driveTrain.arcadeDrive(0, -.20);
-        }
-        else
-        {
-          if (objectHorizontalCenterCoordinate > 169)
-          {
-            SmartDashboard.putBoolean("turn left", false);
-            SmartDashboard.putBoolean("turn right", true);
-            driveTrain.arcadeDrive(0, .20);
-          }
-          else
-          {
-            SmartDashboard.putBoolean("turn left", false);
-            SmartDashboard.putBoolean("turn right", false);
-            driveTrain.arcadeDrive(0, 0);
-          }
-        }
-      }
-      else
-      {
-        driveTrain.arcadeDrive(0,0);
-      }
+      ArcadeDriveInputs driveInputs = pixyTracker.getMotorInputs(sensorInputs);
+      driveTrain.arcadeDrive(driveInputs.speed, driveInputs.rotation);
     }
     else
     {
-      SmartDashboard.putBoolean("pixy drive", false);
       driveTrain.arcadeDrive(
       -controlInputs.driveStickY*forwardPower,
       controlInputs.driveStickX*turnPower);  
